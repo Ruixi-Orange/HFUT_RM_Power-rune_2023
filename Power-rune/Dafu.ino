@@ -33,9 +33,48 @@ TaskHandle_t handleLEDCtrl = NULL;
 
 void fillLED(void)
 {
-  for (int i = 0; i < NUM_LEDS; i++)
+  uint8_t ar[32][8] = {
+      {1, 0, 0, 0, 0, 0, 0, 1},
+      {1, 1, 0, 0, 0, 0, 1, 1},
+      {1, 1, 1, 0, 0, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {0, 1, 1, 1, 1, 1, 1, 0},
+      {0, 0, 1, 1, 1, 1, 0, 0},
+      {0, 0, 0, 1, 1, 0, 0, 0}
+      };
+  for (int i = 0; i < 32; i++)
   {
-    leds[i] = CHSV(0, 255, 100);
+    for (int j = 0; j < 8; j++){
+      leds[i*8+j] = CHSV(0, 255, 200*ar[i][j]);
+    }    
   }
   FastLED.show();
   vTaskDelay(49);
@@ -94,12 +133,16 @@ void LEDCtrl(void *Parameter)
   vTaskDelete(NULL);
 }
 
-void LEDChange(void *Parameter)
+void soundcheck(void *Parameter)
 {
   while (1)
   {
-    vTaskDelay(1000);
-    taskflag=!taskflag;    
+      if(taskflag==1){
+        vTaskDelay(5000);
+        taskflag=0;
+      }
+      if(digitalRead(13))taskflag=1;
+      vTaskDelay(1);
   }
   vTaskDelete(NULL);
 }
@@ -109,14 +152,15 @@ void setup()
 {
   //Serial.begin(115200);
   WS2812Init();
+  pinMode(13,INPUT);  
   xTaskCreate(LEDCtrl,        // 任务函数
               "LEDCtrl",      // 任务名字
               1024,           // 任务堆栈大小
               NULL,           // 传递给任务函数的参数
               2,              // 任务优先级
               NULL); // 任务句柄*/
-  xTaskCreate(LEDChange,        // 任务函数
-              "LEDChange",      // 任务名字
+  xTaskCreate(soundcheck,        // 任务函数
+              "soundcheck",      // 任务名字
               1024,           // 任务堆栈大小
               NULL,
               1,
