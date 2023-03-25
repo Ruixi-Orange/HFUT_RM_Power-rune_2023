@@ -4,10 +4,14 @@
 #include <Arduino.h>
 /******************宏定义***********************/
 
-#define NUM_LEDS 8 * 32 // 灯珠数量
+#define NUM_LEDS1 8 * 32 // 灯珠数量
+#define NUM_LEDS2 52
+#define NUM_LEDS3 83
+#define NUM_LEDS NUM_LEDS2 + NUM_LEDS3
 #define LED_TYPE WS2812 // 灯带型号
 #define COLOR_ORDER GRB // 输入颜色的顺序 根据手册决定
-CRGB leds[NUM_LEDS];    // 构建灯珠对象
+CRGB leds[NUM_LEDS1];    // 构建灯珠对象
+CRGB line[NUM_LEDS2];
 
 void nextPattern(void);
 void test(void);
@@ -17,7 +21,8 @@ void Arrowhead(void);
 
 /****************外部电路引脚定义**********************/
 
-#define DATA_PIN 5 // 灯带引脚定义
+#define DATA_PIN1 5 // 灯带引脚定义
+#define DATA_PIN2 13
 
 /****************外部电路引脚定义**********************/
 
@@ -83,6 +88,15 @@ void fillLED(void)
 void Arrowhead(void)
 {
   uint8_t ar[8][8] = {
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1}};
+  /*uint8_t ar[8][8] = {
       {1, 0, 0, 0, 0, 0, 0, 1},
       {1, 1, 0, 0, 0, 0, 1, 1},
       {1, 1, 1, 0, 0, 1, 1, 1},
@@ -90,7 +104,7 @@ void Arrowhead(void)
       {0, 1, 1, 1, 1, 1, 1, 0},
       {0, 0, 1, 1, 1, 1, 0, 0},
       {0, 0, 0, 1, 1, 0, 0, 0},
-      {0, 0, 0, 0, 0, 0, 0, 0}};
+      {0, 0, 0, 0, 0, 0, 0, 0}};*/
   for (int k = 0; k < 4; k++)
   {
     for (int i = 0; i < 8; i++)
@@ -109,7 +123,8 @@ void Arrowhead(void)
 void WS2812Init(void)
 {
   delay(1000);                                                                                     // 上电延迟
-  FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip); // 初始化灯带模板 无需变动复制粘贴即可
+  FastLED.addLeds<LED_TYPE, DATA_PIN1, COLOR_ORDER>(leds, NUM_LEDS1).setCorrection(TypicalLEDStrip); // 初始化灯带模板 无需变动复制粘贴即可
+  FastLED.addLeds<LED_TYPE, DATA_PIN2, COLOR_ORDER>(line, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(max_bright);                                                               // 初始化亮度
 }
 
@@ -152,13 +167,19 @@ void setup()
 {
   //Serial.begin(115200);
   WS2812Init();
-  pinMode(13,INPUT);  
+  pinMode(13,INPUT);   
+  /*for(int i = 0;i < NUM_LEDS;i++){
+    line[i] = CHSV(0, 255, 200 );
+  }*/
+  for(int i = NUM_LEDS2+1;i < NUM_LEDS3;i++){
+    line[i] = CHSV(0, 255, 200 );
+  }
   xTaskCreate(LEDCtrl,        // 任务函数
               "LEDCtrl",      // 任务名字
               1024,           // 任务堆栈大小
               NULL,           // 传递给任务函数的参数
               2,              // 任务优先级
-              NULL); // 任务句柄*/
+              NULL); // 任务句柄
   xTaskCreate(soundcheck,        // 任务函数
               "soundcheck",      // 任务名字
               1024,           // 任务堆栈大小
@@ -167,6 +188,7 @@ void setup()
               NULL);
   //if (handleLEDCtrl)
   //Serial.printf("Task LEDCtrl is created .........Done");
+  
 }
 
 void loop()
