@@ -1,0 +1,6 @@
+
+.vscode/arduino.json
+.vscode/c_cpp_properties.json
+Power-rune/debug.cfg
+Power-rune/debug_custom.json
+Power-rune/esp32.svd
