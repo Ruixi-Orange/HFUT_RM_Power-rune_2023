@@ -4,3 +4,8 @@
 Power-rune/debug.cfg
 Power-rune/debug_custom.json
 Power-rune/esp32.svd
+Icon_R/.vscode/arduino.json
+Icon_R/.vscode/c_cpp_properties.json
+Icon_R/debug.cfg
+Icon_R/esp32.svd
+Icon_R/debug_custom.json
